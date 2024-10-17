@@ -1,54 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css'; // Import calendar styles
-import '../App.css'; // Ensure you are importing your custom styles
-import ProgressList from './ProgressList';
+import React from 'react';
+import { Calendar } from 'react-calendar';
+import 'react-calendar/dist/Calendar.css'; // Keep this for calendar styles
 
 const ProgressCalendar = ({ progressEntries }) => {
-    const [date, setDate] = useState(new Date());
-
-    // Update current time every second
-    const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setCurrentTime(new Date().toLocaleTimeString()); // Update time every second
-        }, 1000);
-
-        return () => clearInterval(interval); // Cleanup interval on unmount
-    }, []);
-
-    // Filter entries for the selected date
-    const filteredEntries = progressEntries.filter(entry => 
-        new Date(entry.date).toDateString() === date.toDateString()
-    );
-
     return (
-        <div>
-            <div>
-                <h3>The Time is: {currentTime}</h3> {/* Display current time */}
-            </div>
+        <div className="progress-calendar" style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '20px' }}>
+            <h2>The Time is: {new Date().toLocaleTimeString()}</h2>
+            <h3 style={{ textAlign: 'center', marginBottom: '10px' }}>Calendar</h3>
             <Calendar 
-                onChange={setDate} 
-                value={date} 
-                className="react-calendar" // Add your custom class for styling
+                tileClassName={({ date, view }) => {
+                    // Highlight the current date
+                    if (date.getDate() === new Date().getDate() && view === 'month') {
+                        return 'highlight-today'; // Class for highlighting today
+                    }
+                }}
             />
-            <h2>Progress on {date.toLocaleString('default', { month: 'long' })} {date.getFullYear()}:</h2>
-            <div>
-                {filteredEntries.length > 0 ? (
-                    filteredEntries.map(entry => (
-                        <div key={entry._id}>
-                            <h4>By {entry.developer}</h4>
-                            <p>{entry.details}</p>
-                            <p>Status: {entry.status}</p>
-                            <p>Time Spent: {entry.timeSpent}</p>
-                            <p>Task Link: <a href={entry.taskLink} target="_blank" rel="noopener noreferrer">{entry.taskLink}</a></p>
-                        </div>
-                    ))
-                ) : (
-                    <p>No progress entries found for this date.</p>
-                )}
-            </div>
+            <h3 style={{ marginTop: '20px' }}>Progress on October 2024:</h3>
+            {progressEntries.length > 0 ? (
+                progressEntries.map(entry => (
+                    <div key={entry._id} className="progress-entry">
+                        <p>{new Date(entry.date).toLocaleDateString()} - {entry.details}</p>
+                        <p>Status: {entry.status}</p>
+                        <p>Task Link: <a href={entry.taskLink} target="_blank" rel="noopener noreferrer">{entry.taskLink}</a></p>
+                    </div>
+                ))
+            ) : (
+                <p>No progress entries found for this date.</p>
+            )}
         </div>
     );
 };

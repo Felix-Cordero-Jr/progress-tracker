@@ -1,92 +1,49 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
-const ProgressForm = ({ onSubmit, initialData }) => {
-    const [entry, setEntry] = useState(initialData || { 
-        date: '', 
-        details: '', 
-        status: 'New Task', 
-        developer: '', 
-        timeSpent: '0 hours', 
-        taskLink: '',
+const ProgressForm = ({ onSave }) => {
+    const [formData, setFormData] = useState({
+        date: '',
+        details: '',
+        status: 'New Task',
+        taskLink: ''
     });
-
-    useEffect(() => {
-        if (initialData) {
-            setEntry(initialData); // Populate form with initial data when editing
-        } else {
-            setEntry({ 
-                date: '', 
-                details: '', 
-                status: 'New Task', 
-                developer: '', 
-                timeSpent: '0 hours', 
-                taskLink: '',
-            });
-        }
-    }, [initialData]);
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setEntry({ ...entry, [name]: value });
-    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
-        // Format the date before saving
-        entry.date = new Date(entry.date).toISOString(); // Save in ISO format
-
-        onSubmit(entry); // Call the onSubmit function with the current entry
-        
-        // Reset the form for the next entry
-        setEntry({ 
-            date: '', 
-            details: '', 
-            status: 'New Task', 
-            developer: '', 
-            timeSpent: '0 hours', 
-            taskLink: '',
-        });
+        onSave(formData); // Call the onSave function passed from the parent
+        setFormData({ date: '', details: '', status: 'New Task', taskLink: '' }); // Reset form
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <input
-                type="date"
-                name="date"
-                value={entry.date}
-                onChange={handleChange}
-                required
-            />
-            <textarea
-                name="details"
-                value={entry.details}
-                onChange={handleChange}
-                placeholder="What did you learn today?"
-                required
-            />
-            <select name="status" value={entry.status} onChange={handleChange}>
-                <option value="New Task">New Task</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Done">Done</option>
-            </select>
-            <input
-                type="text"
-                name="developer"
-                value={entry.developer}
-                onChange={handleChange}
-                placeholder="Developer's Name"
-                required
-            />
-            <input
-                type="url"
-                name="taskLink"
-                value={entry.taskLink}
-                onChange={handleChange}
-                placeholder="Link to Task (URL)"
-            />
-            <button type="submit">Save Progress</button>
-        </form>
+        <div className="progress-form" style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '20px', backgroundColor: '#fff' }}>
+            <form onSubmit={handleSubmit}>
+                <div className="form-group">
+                    <label>Date:</label>
+                    <input type="date" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} required />
+                </div>
+
+                <div className="form-group">
+                    <label>Details:</label>
+                    <textarea value={formData.details} onChange={(e) => setFormData({ ...formData, details: e.target.value })} required placeholder="Enter details about your progress..." />
+                </div>
+
+                <div className="form-group">
+                    <label>Status:</label>
+                    <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })}>
+                        <option value="New Task">New Task</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                </div>
+
+                <div className="form-group">
+                    <label>Link to Task (URL):</label>
+                    <input type="url" value={formData.taskLink} onChange={(e) => setFormData({ ...formData, taskLink: e.target.value })} placeholder="https://example.com" />
+                </div>
+
+                <button type="submit">Save Progress</button>
+            </form>
+        </div>
     );
 };
 
